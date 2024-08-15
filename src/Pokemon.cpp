@@ -112,10 +112,7 @@ std::string Pokemon::useMove(size_t moveIndex, Pokemon& target)
     {
         return pokemonMoves[moveIndex]->use(*this, target);
     }
-    else
-    {
-        return "Invalid move index!";
-    }
+    return "Invalid move index!";
 }
 
 bool Pokemon::isDefeated() const
