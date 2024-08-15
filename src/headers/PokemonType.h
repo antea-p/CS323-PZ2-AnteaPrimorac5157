@@ -12,5 +12,6 @@ enum class PokemonType
 };
 
 std::string pokemonTypeToString(PokemonType type);
+bool isSuperEffective(PokemonType attackerType, PokemonType targetType);
 
 #endif //POKEMONTYPE_H
