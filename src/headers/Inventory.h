@@ -15,9 +15,10 @@ public:
     Inventory(std::vector<Item *>& items) : items(items) {}
 
     virtual ~Inventory();
+    Inventory(const Inventory &other) = delete;
+    Inventory &operator=(const Inventory &other) = delete;
 
     const std::vector<Item *>& getItems() const;
-
     void setItems(const std::vector<Item *>& newItems);
 
     void generateInventory();
@@ -26,4 +27,4 @@ public:
 };
 
 
-#endif INVENTORY_H
+#endif //INVENTORY_H

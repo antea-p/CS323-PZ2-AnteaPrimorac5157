@@ -7,6 +7,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/headers)
 
 file(GLOB_RECURSE SOURCES
         "${CMAKE_SOURCE_DIR}/src/*.cpp"
+        "${CMAKE_SOURCE_DIR}/src/moves/*.cpp"
+        "${CMAKE_SOURCE_DIR}/src/items/*.cpp"
+        "${CMAKE_SOURCE_DIR}/src/exceptions/*.cpp"
 )
 
 file(GLOB_RECURSE HEADERS
