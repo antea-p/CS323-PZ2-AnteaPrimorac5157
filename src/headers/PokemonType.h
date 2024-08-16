@@ -8,7 +8,8 @@ enum class PokemonType
     ELECTRIC,
     FIRE,
     WATER,
-    GRASS
+    GRASS,
+    COUNT // https://stackoverflow.com/a/14989325
 };
 
 std::string pokemonTypeToString(PokemonType type);
