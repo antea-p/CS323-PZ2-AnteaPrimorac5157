@@ -2,13 +2,27 @@
 #include "../headers/Pokemon.h"
 #include "../headers/moves/Ember.h"
 
-std::string Ember::getName() const
+Ember::Ember()
 {
-    return "Ember";
+    name = "Ember";
 }
 
-std::string Ember::use(Pokemon& user, Pokemon& target)
+std::string Ember::getName() const
 {
-    target.setHealth(target.getHealth() - 20);
+    return name;
+}
+
+int Ember::getDamageAmount() const
+{
+    return 20;
+}
+
+PokemonType Ember::getDamageType() const
+{
+    return PokemonType::FIRE;
+}
+
+std::string Ember::getDamageMessage(const Pokemon& user, const Pokemon& target) const
+{
     return user.getName() + " enrobed " + target.getName() + " in flame!";
 }

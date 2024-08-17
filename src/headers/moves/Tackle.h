@@ -5,10 +5,14 @@
 class Tackle : public PokemonMove
 {
 public:
-    Tackle() : PokemonMove() {}
+    Tackle();
 
-    virtual std::string getName() const override;
-    virtual std::string use(Pokemon& user, Pokemon& target) override;
+    std::string getName() const override;
+
+protected:
+    int getDamageAmount() const override;
+    PokemonType getDamageType() const override;
+    std::string getDamageMessage(const Pokemon& user, const Pokemon& target) const override;
 };
 
 #endif //TACKLE_H

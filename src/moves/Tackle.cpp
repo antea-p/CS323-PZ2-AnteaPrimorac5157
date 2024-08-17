@@ -1,15 +1,27 @@
 #include "../headers/Pokemon.h"
 #include "../headers/moves/Tackle.h"
 
+Tackle::Tackle()
+{
+    name = "Tackle";
+}
 
 std::string Tackle::getName() const
 {
-    return "Tackle";
+    return name;
 }
 
-
-std::string Tackle::use(Pokemon& user, Pokemon& target)
+int Tackle::getDamageAmount() const
 {
-    target.setHealth(target.getHealth() - 30);
+    return 30;
+}
+
+PokemonType Tackle::getDamageType() const
+{
+    return PokemonType::NORMAL;
+}
+
+std::string Tackle::getDamageMessage(const Pokemon& user, const Pokemon& target) const
+{
     return user.getName() + " tackled " + target.getName() + " head-on!";
 }
