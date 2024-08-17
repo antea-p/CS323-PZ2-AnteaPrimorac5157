@@ -15,10 +15,9 @@ const std::vector<PokemonMove *> Battle::RANDOM_MOVES = {
 };
 
 Battle::Battle() :
-    player(nullptr),
-    enemy(nullptr),
-    fileRepository("score.txt", "pokemon-list-en.txt")
-{
+        player(nullptr),
+        enemy(nullptr),
+        fileRepository("score.txt", "pokemon-list-en.txt") {
     srand(static_cast<unsigned int>(time(nullptr)));
 
     initializePokemonNames();

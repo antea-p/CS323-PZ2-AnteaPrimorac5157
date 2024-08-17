@@ -2,6 +2,7 @@
 #define BATTLE_H
 
 #include <vector>
+#include <string>
 #include "PokemonMove.h"
 #include "Pokemon.h"
 #include "Inventory.h"
@@ -12,17 +13,17 @@ class Battle
 private:
     Pokemon *player, *enemy;
     Inventory inventory;
-    FileRepository fileRepository;
     unsigned int highScore;
+    FileRepository fileRepository;
+    std::vector<std::string> pokemonNames;
 
     Pokemon *setUpPlayerPokemon();
     Pokemon *setUpEnemyPokemon();
     Pokemon *setUpPokemon(const std::string &name);
+    void initializePokemonNames();
 
 public:
-    static const int NUM_POKEMON_MOVES = 4;
     static const std::vector<PokemonMove *> RANDOM_MOVES;
-    static const std::vector<std::string> NAMES;
 
     Battle();
     ~Battle();
