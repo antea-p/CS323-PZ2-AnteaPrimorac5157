@@ -1,17 +1,18 @@
 #ifndef BATTLE_H
 #define BATTLE_H
 
-
 #include <vector>
 #include "PokemonMove.h"
 #include "Pokemon.h"
 #include "Inventory.h"
+#include "FileRepository.h"
 
 class Battle
 {
 private:
-    Pokemon* player, *enemy;
+    Pokemon *player, *enemy;
     Inventory inventory;
+    FileRepository fileRepository;
     int highScore;
 
     Pokemon* setUpPlayerPokemon();
@@ -19,6 +20,7 @@ private:
     Pokemon* setUpPokemon(const std::string& name);
 
 public:
+    static const int NUM_POKEMON_MOVES = 4;
     static const std::vector<PokemonMove*> RANDOM_MOVES;
     static const std::vector<std::string> NAMES;
 
@@ -36,6 +38,5 @@ public:
     void endBattle();
     void startGameLoop();
 };
-
 
 #endif //BATTLE_H

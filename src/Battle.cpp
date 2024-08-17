@@ -1,13 +1,13 @@
 #include <iostream>
 #include <set>
+#include <limits>
 #include "Battle.h"
 #include "moves/Ember.h"
 #include "moves/Tackle.h"
 #include "exceptions/InvalidChoiceException.h"
 
-// TODO: I/O, izuzeci
 const std::vector<PokemonMove *> Battle::RANDOM_MOVES = {
-    new Ember(), new Tackle()
+        new Ember(), new Tackle()
 };
 
 const std::vector<std::string> Battle::NAMES = {
@@ -16,8 +16,7 @@ const std::vector<std::string> Battle::NAMES = {
         "Pidgey", "Jigglypuff", "Psyduck", "Staryu"
 };
 
-Battle::Battle() : player(nullptr), enemy(nullptr)
-{
+Battle::Battle() : player(nullptr), enemy(nullptr), fileRepository("score.txt") {
     srand(static_cast<unsigned int>(time(nullptr)));
 
     player = setUpPlayerPokemon();
@@ -28,40 +27,51 @@ Battle::Battle() : player(nullptr), enemy(nullptr)
 Battle::~Battle() {
     delete player;
     delete enemy;
-    for (PokemonMove* pokemonMove: RANDOM_MOVES) {
+    for (PokemonMove *pokemonMove: RANDOM_MOVES) {
         delete pokemonMove;
     }
 }
 
 void Battle::askPlayerInput() {
     int menuChoice;
-    std::cout << "Enter choice (1-2): \n Use move \n 2) Use item" << std::endl;
-    std::cin >> menuChoice;
-    if (menuChoice == 1) {
+    if (inventory.isEmpty()) {
+        std::cout << "1) Use move" << std::endl;
+        if (!(std::cin >> menuChoice) || (menuChoice != 1)) {
+            throw InvalidChoiceException();
+        }
         usePlayerMove();
-    } else if (menuChoice == 2) {
-        usePlayerItem();
-    } else {
-        std::cerr << "Invalid choice exception!" << std::endl;
     }
+    else {
+        std::cout << "Enter choice (1-2): \n 1) Use move \n 2) Use item" << std::endl;
+        if (!(std::cin >> menuChoice) || (menuChoice != 1 && menuChoice != 2)) {
+            throw InvalidChoiceException();
+        }
+        if (menuChoice == 1) {
+            usePlayerMove();
+        } else { // menuChoice == 2
+            usePlayerItem();
+        }
+    }
+
 }
 
 template<typename T>
-void Battle::getPlayerChoice(const std::vector<T *> & usables) {
+void Battle::getPlayerChoice(const std::vector<T *> &usables) {
     int choice;
     std::cout << "Enter choice:" << std::endl;
-    for (size_t i = 0; i < usables.size(); ++i) {
-        // primjer formata poruke ispod: `1) Potion`
-        std::cout << i + 1 << ") " << usables[i]->getName() << std::endl;
+    for (int i = 0; i < usables.size(); ++i) {
+        // primjer formata poruke ispod: ` 1) Potion`
+        std::string message(" " + std::to_string(i + 1) + ") " + usables[i]->getName());
+        std::cout << message << "\n";
     }
 
-    std::cin >> choice;
-    if (choice < 1 || choice > usables.size()) {
-        std::string result = usables[choice - 1]->use(*player, *enemy);
-        std::cout << result << std::endl;
-    } else {
-        std::cerr << "Invalid choice exception!" << std::endl;
+    // Ako nije procitan izbor, ili ako je negativan broj, ili veci od broja elemenata u usables vectoru
+    if (!(std::cin >> choice) || choice < 1 || choice > static_cast<int>(usables.size())) {
+        throw InvalidChoiceException();
     }
+
+    std::cout << "PLAYER ACTION: " + usables[choice - 1]->use(*player, *enemy) << std::endl;
+
 }
 
 void Battle::usePlayerItem() {
@@ -74,45 +84,55 @@ void Battle::usePlayerMove() {
 
 void Battle::useEnemyMove() {
     int enemyMoveChoice = rand() % (enemy->getPokemonMoves().size());
-    std::cout << "\n " + enemy->useMove(enemyMoveChoice, *player);
+    std::cout << "ENEMY ACTION: " + enemy->useMove(enemyMoveChoice, *player);
 }
 
-Pokemon* Battle::setUpPlayerPokemon() {
+Pokemon *Battle::setUpPlayerPokemon() {
     std::string name;
-    std::cout << "Enter Pokemon name:";
-    std::cin >> name;
+    std::cout << "Enter Pokemon name: ";
+    if (!(std::cin >> name) || name.empty()) {
+        throw std::runtime_error("Couldn't read the input! Make sure the name isn't empty!");
+    }
+    return setUpPokemon(name);
 }
 
-Pokemon* Battle::setUpEnemyPokemon() {
-    int nameChoice = rand() & Battle::NAMES.size();
+Pokemon *Battle::setUpEnemyPokemon() {
+    int nameChoice = rand() % Battle::NAMES.size();
     return setUpPokemon(Battle::NAMES[nameChoice]);
 };
 
-Pokemon* setUpPokemon(const std::string& name) {
+Pokemon *Battle::setUpPokemon(const std::string &name) {
     int typeChoice = rand() % static_cast<int>(PokemonType::COUNT);
-    PokemonType pokemonType = static_cast<PokemonType>(typeChoice);
+    auto pokemonType = static_cast<PokemonType>(typeChoice);
 
     int health = (rand() % 351) + 150;
 
-    // Koristenje seta sprecava move-ove duplikate
-    std::vector<PokemonMove *> moves;
+    const int maxMovesSlots = 4;
+    const int totalMovesCount = Battle::RANDOM_MOVES.size();
+    std::vector<PokemonMove *> pokemonMoves;
     std::set<int> seen;
-    for (int i = 0; i < 4; i++) {
+
+    for (int i = 0; i < std::min(maxMovesSlots, totalMovesCount); ++i) {
         int choice;
         do {
-            choice = rand() % Battle::RANDOM_MOVES.size();
+            choice = rand() % totalMovesCount;
+            //  second je bool vrijednost koja ukazuje da li je element umetnut
         } while (!seen.insert(choice).second);
-        moves.push_back(Battle::RANDOM_MOVES[choice]);
+        pokemonMoves.push_back(Battle::RANDOM_MOVES[choice]);
     }
 
-    return new Pokemon(name, health, health, pokemonType, moves);
+    return new Pokemon(name, health, health, pokemonType, pokemonMoves);
 }
 
 void Battle::printStatusMessages() const {
-    std::cout << "------------------------" << std::endl;
+    std::cout << "\n------------------------" << std::endl;
     std::cout << "Player Pokemon status:" << std::endl;
     std::cout << player->getStatusAsString() << std::endl;
+    std::cout << "------------------------" << std::endl;
+    std::cout << "Player Pokemon moves:" << std::endl;
     std::cout << player->getPokemonMovesAsString() << std::endl;
+    std::cout << "------------------------" << std::endl;
+    std::cout << "Your inventory:" << std::endl;
     std::cout << inventory.getItemsString();
     std::cout << "------------------------" << std::endl;
     std::cout << "Enemy Pokemon status:" << std::endl;
@@ -122,30 +142,36 @@ void Battle::printStatusMessages() const {
 
 void Battle::endBattle() {
     if (enemy->isDefeated()) {
-        std::cout << "Enemy defeated!" << std::endl;
+        std::cout << "\nEnemy defeated!" << std::endl;
         highScore++;
     } else if (player->isDefeated()) {
-        std::cout << "Sorry, you lose!" << std::endl;
+        std::cout << "\nSorry, you lose!" << std::endl;
         highScore = 0;
     }
-    // TODO: file I/O
+    fileRepository.writeScore(highScore);
 }
 
 void Battle::startGameLoop() {
-    // TODO: file I/O 
-    std::cout << "Your high score: " << highScore << std::endl;
-    do {
+    std::cout << "Your high score: " << fileRepository.readScore() << std::endl;
+    bool continueBattle = true;
+
+    while (continueBattle && !enemy->isDefeated() && !player->isDefeated()) {
         try {
             printStatusMessages();
             askPlayerInput();
             useEnemyMove();
-        } catch (const InvalidChoiceException &) {
-            std::cerr << "~~~~~~~~~~~~~~~~~~~~~~\n"
-                      << "Invalid choice number!\n"
-                      << "~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        } catch (const InvalidChoiceException &e) {
+            std::cerr << e.what();
+            std::cerr << " The turn will be skipped!";
+            std::cin.clear(); // https://stackoverflow.com/questions/25020129/cin-ignorenumeric-limitsstreamsizemax-n
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } catch (const std::logic_error &e) {
+            std::cerr << e.what();
+            std::cerr << " The turn will be skipped!" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "An error occurred: " << e.what() << std::endl;
+            continueBattle = false;  // Izadji iz petlje
         }
-    } while (!enemy->isDefeated() && !player->isDefeated());
+    }
     endBattle();
 }
