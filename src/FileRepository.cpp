@@ -25,6 +25,7 @@ unsigned int FileRepository::readScore() {
     if (!inputFile) {
         throw std::runtime_error("Unable to open file for reading: " + scoreFilename);
     }
+    inputFile >> score;
     inputFile.close();
 
     return score;
@@ -32,7 +33,7 @@ unsigned int FileRepository::readScore() {
 
 void FileRepository::checkFileExists() {
     std::ifstream checkFile(scoreFilename);
-    if (!checkFile) { // datoteka ne postoji
+    if (!checkFile) {
         std::ofstream createFile(scoreFilename);
         if (!createFile) {
             throw std::runtime_error("Unable to create a file: " + scoreFilename);
