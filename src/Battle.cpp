@@ -2,23 +2,26 @@
 #include <set>
 #include <limits>
 #include "Battle.h"
-#include "moves/Ember.h"
-#include "moves/Tackle.h"
 #include "exceptions/InvalidChoiceException.h"
+#include "headers/moves/Ember.h"
+#include "headers/moves/Tackle.h"
+#include "headers/moves/Nuzzle.h"
+#include "headers/moves/TakeDown.h"
+#include "headers/moves/VineWhip.h"
+#include "headers/moves/Bubble.h"
 
 const std::vector<PokemonMove *> Battle::RANDOM_MOVES = {
-        new Ember(), new Tackle()
+        new Ember(), new Tackle(), new TakeDown(), new Bubble(), new Nuzzle(), new VineWhip()
 };
 
-const std::vector<std::string> Battle::NAMES = {
-        "Charmander", "Bulbasaur", "Oddish", "Squirtle",
-        "Vulpix", "Eevee", "Meowth", "Rattata",
-        "Pidgey", "Jigglypuff", "Psyduck", "Staryu"
-};
-
-Battle::Battle() : player(nullptr), enemy(nullptr), fileRepository("score.txt") {
+Battle::Battle() :
+    player(nullptr),
+    enemy(nullptr),
+    fileRepository("score.txt", "pokemon-list-en.txt")
+{
     srand(static_cast<unsigned int>(time(nullptr)));
 
+    initializePokemonNames();
     player = setUpPlayerPokemon();
     enemy = setUpEnemyPokemon();
     inventory.generateInventory();
@@ -32,6 +35,13 @@ Battle::~Battle() {
         delete pokemonMove;
     }
 }
+
+
+void Battle::initializePokemonNames() {
+    std::set<std::string> pokemonSet = fileRepository.readAllPokemonSpecies();
+    pokemonNames.assign(pokemonSet.begin(), pokemonSet.end());
+}
+
 
 void Battle::askPlayerInput() {
     int menuChoice;
@@ -70,7 +80,6 @@ void Battle::getPlayerChoice(const std::vector<T *> &usables) {
     }
 
     std::cout << "PLAYER ACTION: " + usables[choice - 1]->use(*player, *enemy) << std::endl;
-
 }
 
 void Battle::usePlayerItem() {
@@ -96,15 +105,15 @@ Pokemon *Battle::setUpPlayerPokemon() {
 }
 
 Pokemon *Battle::setUpEnemyPokemon() {
-    int nameChoice = rand() % Battle::NAMES.size();
-    return setUpPokemon(Battle::NAMES[nameChoice]);
+    int nameChoice = rand() % pokemonNames.size();
+    return setUpPokemon(pokemonNames[nameChoice]);
 };
 
 Pokemon *Battle::setUpPokemon(const std::string &name) {
     int typeChoice = rand() % static_cast<int>(PokemonType::COUNT);
     auto pokemonType = static_cast<PokemonType>(typeChoice);
 
-    int health = (rand() % 351) + 150;
+    int health = (rand() % 351) + 10;
 
     const int maxMovesSlots = 4;
     const int totalMovesCount = Battle::RANDOM_MOVES.size();

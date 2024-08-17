@@ -16,6 +16,7 @@ file(GLOB_RECURSE HEADERS
         "${CMAKE_SOURCE_DIR}/src/headers/*.h"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS}
+)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
