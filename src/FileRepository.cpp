@@ -3,7 +3,7 @@
 #include <iostream>
 
 void FileRepository::writeScore(unsigned int score) {
-    checkFileExists();
+    checkScoreFileExists();
     std::ofstream file{scoreFilename};
     if (!file) {
         throw std::runtime_error("Unable to open file for writing: " + scoreFilename);
@@ -18,7 +18,7 @@ void FileRepository::writeScore(unsigned int score) {
 }
 
 unsigned int FileRepository::readScore() {
-    checkFileExists();
+    checkScoreFileExists();
     unsigned int score = 0;
     std::ifstream inputFile{scoreFilename};
 
@@ -31,7 +31,7 @@ unsigned int FileRepository::readScore() {
     return score;
 }
 
-void FileRepository::checkFileExists() {
+void FileRepository::checkScoreFileExists() {
     std::ifstream checkFile(scoreFilename);
     if (!checkFile) {
         std::ofstream createFile(scoreFilename);
@@ -44,5 +44,21 @@ void FileRepository::checkFileExists() {
     } else {
         checkFile.close();
     }
+}
+std::set<std::string> FileRepository::readAllPokemonSpecies() const {
+    std::ifstream inputFile{pokemonListFilename};
+    std::set<std::string> pokemonSpeciesSet;
+
+    if (!inputFile) {
+        throw std::runtime_error("Unable to open file for reading: " + pokemonListFilename);
+    }
+
+    std::string line{};
+    while (std::getline(inputFile, line)) {
+        pokemonSpeciesSet.insert(line);
+    }
+    inputFile.close();
+
+    return pokemonSpeciesSet;
 }
 
