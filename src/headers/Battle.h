@@ -13,15 +13,15 @@ private:
     Pokemon *player, *enemy;
     Inventory inventory;
     FileRepository fileRepository;
-    int highScore;
+    unsigned int highScore;
 
-    Pokemon* setUpPlayerPokemon();
-    Pokemon* setUpEnemyPokemon();
-    Pokemon* setUpPokemon(const std::string& name);
+    Pokemon *setUpPlayerPokemon();
+    Pokemon *setUpEnemyPokemon();
+    Pokemon *setUpPokemon(const std::string &name);
 
 public:
     static const int NUM_POKEMON_MOVES = 4;
-    static const std::vector<PokemonMove*> RANDOM_MOVES;
+    static const std::vector<PokemonMove *> RANDOM_MOVES;
     static const std::vector<std::string> NAMES;
 
     Battle();
@@ -30,7 +30,7 @@ public:
     void askPlayerInput();
 
     template<typename T>
-    void getPlayerChoice(const std::vector<T *> & usables);
+    void getPlayerChoice(const std::vector<T *> &usables);
     void usePlayerItem();
     void usePlayerMove();
     void useEnemyMove();

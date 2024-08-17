@@ -22,6 +22,7 @@ Battle::Battle() : player(nullptr), enemy(nullptr), fileRepository("score.txt") 
     player = setUpPlayerPokemon();
     enemy = setUpEnemyPokemon();
     inventory.generateInventory();
+    highScore = fileRepository.readScore();
 }
 
 Battle::~Battle() {
@@ -40,8 +41,7 @@ void Battle::askPlayerInput() {
             throw InvalidChoiceException();
         }
         usePlayerMove();
-    }
-    else {
+    } else {
         std::cout << "Enter choice (1-2): \n 1) Use move \n 2) Use item" << std::endl;
         if (!(std::cin >> menuChoice) || (menuChoice != 1 && menuChoice != 2)) {
             throw InvalidChoiceException();
@@ -52,7 +52,6 @@ void Battle::askPlayerInput() {
             usePlayerItem();
         }
     }
-
 }
 
 template<typename T>
@@ -152,7 +151,7 @@ void Battle::endBattle() {
 }
 
 void Battle::startGameLoop() {
-    std::cout << "Your high score: " << fileRepository.readScore() << std::endl;
+    std::cout << "Your high score: " << highScore;
     bool continueBattle = true;
 
     while (continueBattle && !enemy->isDefeated() && !player->isDefeated()) {
@@ -160,6 +159,7 @@ void Battle::startGameLoop() {
             printStatusMessages();
             askPlayerInput();
             useEnemyMove();
+            inventory.removeUsedUpItems();
         } catch (const InvalidChoiceException &e) {
             std::cerr << e.what();
             std::cerr << " The turn will be skipped!";
