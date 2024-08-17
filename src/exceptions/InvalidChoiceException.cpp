@@ -1,5 +1,7 @@
-#include "InvalidChoiceException.h"
+#include "exceptions/InvalidChoiceException.h"
 
-const std::string &InvalidChoiceException::getErrorMessage() const {
-    return errorMessage;
+const char* InvalidChoiceException::what() const throw()
+{
+    return "Invalid choice input - likely a number out of range, or a letter. ";
 }
+
