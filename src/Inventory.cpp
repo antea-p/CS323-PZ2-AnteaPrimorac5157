@@ -1,20 +1,20 @@
 #include "Inventory.h"
 #include "items/Potion.h"
 #include "items/Bomb.h"
-#include <sstream>
 #include <time.h>
+#include <algorithm>
 
 Inventory::~Inventory() {
-    for (Item* item : items) {
+    for (Item *item: items) {
         delete item;
     }
 }
 
-const std::vector<Item *>& Inventory::getItems() const {
+const std::vector<Item *> &Inventory::getItems() const {
     return items;
 }
 
-void Inventory::setItems(const std::vector<Item *>& newItems) {
+void Inventory::setItems(const std::vector<Item *> &newItems) {
     items = newItems;
 }
 
@@ -37,18 +37,32 @@ std::string Inventory::getItemsString() const {
     }
 
     std::string result;
-    std::vector<Item*>::const_iterator it;
+    std::vector<Item *>::const_iterator it;
     size_t index = 1;
     for (it = items.begin(); it != items.end(); ++it, ++index) {
         int quantity = (*it)->getQuantity();
         if (quantity > 0) {
             result += "Item #" + std::to_string(index) + ": " + (*it)->getName()
-            + ", Quantity: " + std::to_string((*it)->getQuantity()) + "\n";
+                      + ", Quantity: " + std::to_string((*it)->getQuantity()) + "\n";
         }
     }
     return result;
 }
 
 bool Inventory::isEmpty() const {
-    return items.empty() || (items.size() == 1 && items[0]->getQuantity() == 0);
+    return items.empty() || (items.size() == 1 && items[0]->isUsedUp());
+}
+
+void Inventory::removeUsedUpItems() {
+    items.erase(
+            std::remove_if(items.begin(), items.end(),
+                           [](Item *item) {
+                               if (item->isUsedUp()) {
+                                   delete item;
+                                   return true;
+                               }
+                               return false;
+                           }),
+            items.end()
+    );
 }

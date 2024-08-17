@@ -3,27 +3,29 @@
 
 #include <vector>
 #include <time.h>
+#include <algorithm>
 #include "Item.h"
 
 class Inventory
 {
 private:
-    std::vector<Item*> items;
+    std::vector<Item *> items;
 
 public:
     Inventory() = default;
-    Inventory(std::vector<Item *>& items) : items(items) {}
-
-    virtual ~Inventory();
+    ~Inventory();
     Inventory(const Inventory &other) = delete;
-    Inventory &operator=(const Inventory &other) = delete;
+    Inventory &operator =(const Inventory &other) = delete;
 
-    const std::vector<Item *>& getItems() const;
-    void setItems(const std::vector<Item *>& newItems);
+    const std::vector<Item *> &getItems() const;
+    void setItems(const std::vector<Item *> &newItems);
 
     void generateInventory();
     std::string getItemsString() const;
     bool isEmpty() const;
+    Item *findItem(const std::string &itemName);
+
+    void removeUsedUpItems();
 };
 
 
